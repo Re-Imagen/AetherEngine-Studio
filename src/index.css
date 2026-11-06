@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    --bg-studio-deep: #090d16;
+    --bg-studio-panel: #0f1522;
+    --bg-studio-elevated: #161e30;
+    --bg-studio-hover: #1e2940;
+    --border-studio: rgba(148, 163, 184, 0.14);
+    --accent-cyan: #00f0ff;
+    --accent-purple: #a855f7;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #090d16;
+    color: #e2e8f0;
+    user-select: none;
+  }
+
+  input, textarea, select, code, pre {
+    user-select: text;
+  }
+}
+
+/* Custom Sleek Studio Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(9, 13, 22, 0.7);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.35);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(6, 182, 212, 0.65);
+}
+
+.font-mono-code {
+  font-family: 'JetBrains Mono', 'Fira Code', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+}
+
+.neon-cyan-glow {
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.25), inset 0 0 0 1px rgba(0, 240, 255, 0.35);
+}
+
+.neon-purple-glow {
+  box-shadow: 0 0 14px rgba(168, 85, 247, 0.28), inset 0 0 0 1px rgba(168, 85, 247, 0.4);
+}
+
+.blueprint-grid {
+  background-color: #090d16;
+  background-image:
+    linear-gradient(to right, rgba(30, 41, 59, 0.45) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(30, 41, 59, 0.45) 1px, transparent 1px),
+    linear-gradient(to right, rgba(6, 182, 212, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(6, 182, 212, 0.08) 1px, transparent 1px);
+  background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
+}
+
+.resizer-h {
+  width: 4px;
+  cursor: col-resize;
+  background: rgba(148, 163, 184, 0.08);
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+  z-index: 20;
+}
+
+.resizer-h:hover,
+.resizer-h.active {
+  background: linear-gradient(180deg, #00f0ff, #a855f7);
+}
+
+.resizer-v {
+  height: 4px;
+  cursor: row-resize;
+  background: rgba(148, 163, 184, 0.08);
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+  z-index: 20;
+}
+
+.resizer-v:hover,
+.resizer-v.active {
+  background: linear-gradient(90deg, #00f0ff, #a855f7);
+}
