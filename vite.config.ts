@@ -126,6 +126,9 @@ function aetherCollabPlugin(): Plugin {
 }
 
 export default defineConfig({
+  // Relative asset URLs work on custom domains and project subpaths such as
+  // https://re-imagen.github.io/AetherEngine-Studio/.
+  base: './',
   plugins: [react(), tailwindcss(), aetherCollabPlugin()],
   server: {
     host: '0.0.0.0',

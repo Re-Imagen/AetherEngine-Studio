@@ -44,38 +44,45 @@ export class AetherCollabClient {
       // BroadcastChannel optional
     }
 
-    // 2. Relative WebSocket to Vite / Server Hub (works across devices via QR scan!)
-    try {
-      const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const params = new URLSearchParams({
-        room: this.room,
-        peerId: this.peerId,
-        name: this.userName,
-        color: this.userColor,
-        role: this.role,
-      });
-      const wsUrl = `${proto}//${window.location.host}/aether-ws?${params.toString()}`;
-      this.ws = new WebSocket(wsUrl);
-      this.ws.onopen = () => {
-        this.connected = true;
-      };
-      this.ws.onmessage = (ev) => {
-        try {
-          const msg = JSON.parse(ev.data) as CollabEventMessage & { lamport?: number };
-          if (typeof msg.lamport === 'number') {
-            this.lamport = Math.max(this.lamport, msg.lamport) + 1;
-          }
-          this.emit(msg);
-        } catch {}
-      };
-      this.ws.onclose = () => {
+    // 2. WebSocket hub for cross-device sync. GitHub Pages is static, so avoid
+    // noisy failed requests there and keep the BroadcastChannel peer transport.
+    // A production relay can be configured with VITE_AETHER_WS_URL.
+    const configuredHub = (import.meta.env.VITE_AETHER_WS_URL as string | undefined)?.trim();
+    const isGithubPages = window.location.hostname === 'github.io' || window.location.hostname.endsWith('.github.io');
+    if (configuredHub || !isGithubPages) {
+      try {
+        const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const params = new URLSearchParams({
+          room: this.room,
+          peerId: this.peerId,
+          name: this.userName,
+          color: this.userColor,
+          role: this.role,
+        });
+        const hubBase = configuredHub || `${proto}//${window.location.host}/aether-ws`;
+        const wsUrl = `${hubBase}${hubBase.includes('?') ? '&' : '?'}${params.toString()}`;
+        this.ws = new WebSocket(wsUrl);
+        this.ws.onopen = () => {
+          this.connected = true;
+        };
+        this.ws.onmessage = (ev) => {
+          try {
+            const msg = JSON.parse(ev.data) as CollabEventMessage & { lamport?: number };
+            if (typeof msg.lamport === 'number') {
+              this.lamport = Math.max(this.lamport, msg.lamport) + 1;
+            }
+            this.emit(msg);
+          } catch {}
+        };
+        this.ws.onclose = () => {
+          this.connected = false;
+        };
+        this.ws.onerror = () => {
+          this.connected = false;
+        };
+      } catch {
         this.connected = false;
-      };
-      this.ws.onerror = () => {
-        this.connected = false;
-      };
-    } catch {
-      this.connected = false;
+      }
     }
   }
 

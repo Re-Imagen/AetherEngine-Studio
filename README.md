@@ -47,6 +47,12 @@ Console mendukung `/help`, `/status`, `/bench`, `/spawn cube`, `/spawn sphere`, 
 
 Production build menyertakan web app manifest, install icon, dan service worker. App shell serta hashed JS/CSS/assets di-cache sehingga Studio dapat dibuka kembali saat offline. Development mode tidak mendaftarkan service worker agar HMR tetap stabil; gunakan `npm run build && npm run preview` untuk menguji PWA. Kolaborasi online otomatis kembali menggunakan room yang sama ketika koneksi tersedia.
 
+## GitHub Pages
+
+Workflow `.github/workflows/deploy-pages.yml` membangun aplikasi dengan Node.js 22 dan `npm ci`, lalu men-deploy hasil `dist` setiap push ke `main`. Pada **Settings → Pages**, pilih **GitHub Actions** sebagai source. Asset, manifest, invite URL, dan service worker bersifat subpath-safe sehingga deployment seperti `https://<owner>.github.io/<repository>/` maupun custom domain dapat menggunakan build yang sama.
+
+GitHub Pages hanya menyajikan file statis dan tidak menjalankan WebSocket relay Vite. BroadcastChannel tetap tersedia untuk sinkronisasi antar-tab; relay lintas perangkat dapat dikonfigurasi saat build melalui `VITE_AETHER_WS_URL` menuju endpoint `wss://` eksternal.
+
 ## Arsitektur
 
 - `src/components/` — Dashboard, docking workspace, Three.js viewport, mobile runtime, visual Git, serta publish/export.

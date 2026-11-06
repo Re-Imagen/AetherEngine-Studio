@@ -1,5 +1,7 @@
-const CACHE_NAME = 'aether-studio-shell-v1';
-const APP_SHELL = ['/', '/manifest.webmanifest', '/aether-icon.svg'];
+// Scope-aware PWA cache: works at https://example.com and project subpaths.
+const BASE_PATH = new URL(self.registration.scope).pathname;
+const CACHE_NAME = `aether-studio-shell-v2:${BASE_PATH}`;
+const APP_SHELL = [BASE_PATH, `${BASE_PATH}manifest.webmanifest`, `${BASE_PATH}aether-icon.svg`];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -22,21 +24,22 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET') return;
 
   const url = new URL(request.url);
-  if (url.origin !== self.location.origin || url.pathname.startsWith('/aether-ws') || url.pathname.startsWith('/api/')) return;
+  if (url.origin !== self.location.origin) return;
+  if (url.pathname.startsWith(`${BASE_PATH}aether-ws`) || url.pathname.startsWith(`${BASE_PATH}api/`)) return;
 
   // Documents use network-first so a new deployment is picked up immediately,
-  // then fall back to the cached app shell when the device goes offline.
+  // then fall back to the scoped app shell when the device goes offline.
   if (request.mode === 'navigate') {
     event.respondWith((async () => {
       try {
         const response = await fetch(request);
         if (response.ok) {
           const cache = await caches.open(CACHE_NAME);
-          await cache.put('/', response.clone());
+          await cache.put(BASE_PATH, response.clone());
         }
         return response;
       } catch {
-        return (await caches.match('/')) || Response.error();
+        return (await caches.match(BASE_PATH)) || Response.error();
       }
     })());
     return;
