@@ -1,16 +1,24 @@
 {
   "name": "AetherEngine Studio",
   "short_name": "Aether Studio",
-  "description": "Build, collaborate, and publish games directly from your browser.",
+  "description": "Buat game kartun 2.5D dengan blok visual tanpa mengetik kode.",
   "id": "./",
   "start_url": "./?source=pwa",
   "scope": "./",
   "display": "standalone",
-  "display_override": ["window-controls-overlay", "standalone", "browser"],
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "browser"
+  ],
   "orientation": "any",
-  "background_color": "#090d16",
-  "theme_color": "#090d16",
-  "categories": ["games", "productivity", "developer"],
+  "background_color": "#f5f3e9",
+  "theme_color": "#f5f3e9",
+  "categories": [
+    "games",
+    "productivity",
+    "developer"
+  ],
   "icons": [
     {
       "src": "./aether-icon.svg",
@@ -21,16 +29,28 @@
   ],
   "shortcuts": [
     {
-      "name": "Open Studio Editor",
+      "name": "Buka editor 2.5D",
       "short_name": "Editor",
       "url": "./?mode=editor&source=pwa-shortcut",
-      "icons": [{ "src": "./aether-icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+      "icons": [
+        {
+          "src": "./aether-icon.svg",
+          "sizes": "any",
+          "type": "image/svg+xml"
+        }
+      ]
     },
     {
-      "name": "Mobile Live Runtime",
-      "short_name": "Live Test",
-      "url": "./?mode=mobile&room=eldoria-main&source=pwa-shortcut",
-      "icons": [{ "src": "./aether-icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+      "name": "Buka Studio klasik",
+      "short_name": "Klasik",
+      "url": "./?mode=classic&source=pwa-shortcut",
+      "icons": [
+        {
+          "src": "./aether-icon.svg",
+          "sizes": "any",
+          "type": "image/svg+xml"
+        }
+      ]
     }
   ]
 }

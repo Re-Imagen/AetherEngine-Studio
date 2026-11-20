@@ -32,6 +32,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Test the 2.5D runtime and project model
+        run: npm test
+
       - name: Build AetherEngine Studio
         run: npm run build
 
