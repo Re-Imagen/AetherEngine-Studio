@@ -4,6 +4,34 @@ import tailwindcss from '@tailwindcss/vite';
 import { WebSocketServer, WebSocket } from 'ws';
 import type { IncomingMessage } from 'node:http';
 import type { Duplex } from 'node:stream';
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+
+// Cache the beginner editor (including its artwork) on the first online visit.
+// Classic Studio's lazy runtime remains cache-on-use rather than a startup download.
+function studioOfflineShell(): Plugin {
+  return {
+    name: 'studio-offline-shell',
+    apply: 'build',
+    enforce: 'post',
+    generateBundle(_, bundle) {
+      const files = new Set<string>();
+      const include = (name: string) => {
+        const chunk = bundle[name];
+        if (!chunk || files.has(name)) return;
+        files.add(name);
+        if (chunk.type === 'chunk') chunk.imports.forEach(include);
+      };
+      for (const file of Object.values(bundle)) {
+        if ((file.type === 'chunk' && file.isEntry) || (file.type === 'asset' && file.fileName.startsWith('assets/'))) include(file.fileName);
+      }
+      const list = JSON.stringify([...files].sort());
+      const revision = createHash('sha256').update(list).digest('hex').slice(0, 12);
+      const worker = readFileSync(new URL('./public/sw.js', import.meta.url), 'utf8');
+      this.emitFile({ type: 'asset', fileName: 'sw.js', source: worker.replace('__BUILD_ID__', revision).replace('/* __BUILT_FILES__ */ []', list) });
+    },
+  };
+}
 
 interface RoomPeer {
   ws: WebSocket;
@@ -129,7 +157,7 @@ export default defineConfig({
   // Relative asset URLs work on custom domains and project subpaths such as
   // https://re-imagen.github.io/AetherEngine-Studio/.
   base: './',
-  plugins: [react(), tailwindcss(), aetherCollabPlugin()],
+  plugins: [react(), tailwindcss(), aetherCollabPlugin(), studioOfflineShell()],
   server: {
     host: '0.0.0.0',
     port: 5173,

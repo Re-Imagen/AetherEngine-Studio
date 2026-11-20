@@ -1,7 +1,8 @@
 // Scope-aware PWA cache: works at https://example.com and project subpaths.
 const BASE_PATH = new URL(self.registration.scope).pathname;
-const CACHE_NAME = `aether-studio-shell-v2:${BASE_PATH}`;
-const APP_SHELL = [BASE_PATH, `${BASE_PATH}manifest.webmanifest`, `${BASE_PATH}aether-icon.svg`];
+const CACHE_NAME = `aether-studio-shell-v3-__BUILD_ID__:${BASE_PATH}`;
+const BUILT_FILES = /* __BUILT_FILES__ */ [];
+const APP_SHELL = [BASE_PATH, ...['manifest.webmanifest', 'aether-icon.svg', ...BUILT_FILES].map(file => `${BASE_PATH}${file}`)];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -14,7 +15,7 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys()
-      .then((keys) => Promise.all(keys.filter((key) => key.startsWith('aether-studio-') && key !== CACHE_NAME).map((key) => caches.delete(key))))
+      .then((keys) => Promise.all(keys.filter((key) => key.startsWith('aether-studio-') && key.endsWith(`:${BASE_PATH}`) && key !== CACHE_NAME).map((key) => caches.delete(key))))
       .then(() => self.clients.claim()),
   );
 });
@@ -24,7 +25,7 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET') return;
 
   const url = new URL(request.url);
-  if (url.origin !== self.location.origin) return;
+  if (url.origin !== self.location.origin || !url.pathname.startsWith(BASE_PATH)) return;
   if (url.pathname.startsWith(`${BASE_PATH}aether-ws`) || url.pathname.startsWith(`${BASE_PATH}api/`)) return;
 
   // Documents use network-first so a new deployment is picked up immediately,
